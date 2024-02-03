@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>End Year and Likelihood Scatter Plot</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f8f9fa;
+      padding-top: 60px;
+      line-height: 1.6;
+      color: #343a40;
+    }
+
+    h1 {
+      color: #343a40;
+      font-size: 36px;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    canvas {
+      margin-top: 20px;
+    }
+
+    nav.navbar {
+      background-color: #343a40;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    nav.navbar-toggler-icon {
+      background-color: #fff;
+    }
+
+    a.navbar-brand {
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    ul.navbar-nav.mr-auto {
+      display: flex;
+      align-items: center;
+    }
+
+    ul.navbar-nav.mr-auto li.nav-item {
+      margin-right: 20px;
+    }
+
+    ul.navbar-nav.mr-auto li.nav-item a.nav-link {
+      color: #fff;
+    }
+
+    ul.navbar-nav.mr-auto li.nav-item.active a.nav-link {
+      color: #007bff;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin-top: 30px;
+      transition: all 0.3s ease;
+    }
+
+    .technologies-section,
+    .inference-section {
+      margin-top: 50px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      display: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      font-weight: bold;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+
+    .inference-section:hover,
+    .technologies-section:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <button class="btn btn-link text-white" onclick="showTechnologies()">Technologies Used</button>
+        </li>
+        <li class="nav-item">
+          <button class="btn btn-link text-white" onclick="showInference()">Inference from Analysis</button>
+        </li>
+      </ul>
+      <button class="btn btn-primary" onclick="goBack()">Go Back to Home Page</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>End Year and Likelihood Anlaysis</h1>
+    <canvas id="scatterChart" width="800" height="400"></canvas>
+
+    <!-- Technologies Section -->
+    <div class="technologies-section" id="technologiesSection">
+      <h2 class="technologies-title">Technologies Used</h2>
+      <ul class="technology-list">
+        <li class="technology-list-item">Bootstrap</li>
+        <li class="technology-list-item">Chart.js</li>
+        <li class="technology-list-item">jQuery</li>
+      </ul>
+    </div>
+
+    <!-- Inference Section -->
+    <div class="inference-section" id="inferenceSection">
+      <h2 class="inference-title">Inference from Analysis</h2>
+      <p>
+        The scatter plot provides a clear visualization of data points, revealing trends and patterns in the relationship between end years and likelihood values. The use of Bootstrap ensures a user-friendly and responsive design, while Chart.js facilitates the creation of an engaging and informative chart. The combination of these technologies enables effective data analysis and presentation.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Fetch data from the server
+      fetch('/api/data')
+        .then(response => response.json())
+        .then(data => {
+          // Extracting end years and likelihoods
+          const endYears = data.map(entry => entry.end_year);
+          const likelihoods = data.map(entry => entry.likelihood);
+
+          // Create a scatter plot using Chart.js
+          const ctx = document.getElementById('scatterChart').getContext('2d');
+          new Chart(ctx, {
+            type: 'scatter',
+            data: {
+              datasets: [{
+                label: 'End Year vs Likelihood',
+                data: endYears.map((year, index) => ({ x: year, y: likelihoods[index] })),
+                backgroundColor: 'rgba(255, 99, 132, 0.6)', // Red
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              scales: {
+                x: {
+                  type: 'linear',
+                  position: 'bottom',
+                  title: {
+                    display: true,
+                    text: 'End Year'
+                  }
+                },
+                y: {
+                  title: {
+                    display: true,
+                    text: 'Likelihood'
+                  }
+                }
+              }
+            }
+          });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    });
+
+    function goBack() {
+      // Add your logic to navigate back to the home page
+      window.location.href = '/';
+    }
+
+    function showTechnologies() {
+      // Show Technologies Section
+      document.querySelector('.technologies-section').style.display = 'block';
+      document.querySelector('.inference-section').style.display = 'none';
+
+      // Scroll to Technologies Section
+      document.querySelector('#technologiesSection').scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+
+    function showInference() {
+      // Show Inference Section
+      document.querySelector('.inference-section').style.display = 'block';
+      document.querySelector('.technologies-section').style.display = 'none';
+
+      // Scroll to Inference Section
+      document.querySelector('#inferenceSection').scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pestle Distribution in each country </title>
+  <!-- Include Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Include D3.js library -->
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f8f9fa;
+      padding-top: 60px;
+      line-height: 1.6;
+      color: #343a40;
+    }
+
+    .navbar {
+      background-color: #343a40;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    .navbar-toggler-icon {
+      background-color: #fff;
+    }
+
+    .navbar-brand {
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    h1 {
+      color: #343a40;
+      font-size: 36px;
+      font-weight: bold;
+    }
+
+    canvas {
+      margin-top: 20px;
+    }
+
+    button {
+      margin-right: 10px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin-top: 30px;
+      transition: all 0.3s ease;
+    }
+
+    /* Additional styling for the Technologies section */
+    .technologies-section,
+    .inference-section,
+    .graph-section {
+      margin-top: 20px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    /* Optional: Add a subtle box shadow on hover */
+    .graph-section:hover,
+    .technologies-section:hover,
+    .inference-section:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Stylish button styles */
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      font-weight: bold;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+
+    /* Additional styling for the Technologies section */
+    .technologies-section,
+    .inference-section {
+      margin-top: 50px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      display: none;
+      transition: all 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <button class="btn btn-link text-white" onclick="showTechnologies()">Technologies Used</button>
+        </li>
+        <li class="nav-item">
+          <button class="btn btn-link text-white" onclick="showInference()">Inference from Analysis</button>
+        </li>
+      </ul>
+      <!-- "Go Back to Home Page" button on the right side of the navbar -->
+      <button class="btn btn-primary" onclick="goBack()">Go Back to Home Page</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="text-center">Pestle Distribution for a Country Pie Chart</h1>
+    <div id="pestleChart" class="graph-section"></div>
+
+    <!-- Technologies Section -->
+    <div class="technologies-section">
+      <h2 class="technologies-title">Technologies Used</h2>
+      <ul class="technology-list">
+        <li class="technology-list-item">Bootstrap</li>
+        <li class="technology-list-item">D3.js</li>
+        <li class="technology-list-item">jQuery</li>
+        <li class="technology-list-item">Chart.js</li>
+      </ul>
+    </div>
+
+    <!-- Inference Section -->
+    <div class="inference-section">
+      <h2 class="inference-title">Inference from Analysis</h2>
+      <p>The pie chart visually represents the distribution of Pestle categories for different countries. Each slice in the chart corresponds to a specific country, and the colors within each slice represent different Pestle categories. The size of each slice is proportional to the percentage distribution of Pestle categories within the respective country. This graphical representation allows for a quick and intuitive understanding of the relative impact of various Pestle factors across different countries.</p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Fetch data from the server
+      fetch('/api/data')
+        .then(response => response.json())
+        .then(data => {
+          // Extracting country names and corresponding pestle categories
+          const countries = data.map(entry => entry.country);
+          const pestleCategories = data.map(entry => entry.pestle);
+
+          // Create a nested object to count pestle occurrences in each country
+          const pestleCountByCountry = {};
+          countries.forEach((country, index) => {
+            if (!pestleCountByCountry[country]) {
+              pestleCountByCountry[country] = {};
+            }
+            const pestle = pestleCategories[index];
+            pestleCountByCountry[country][pestle] = (pestleCountByCountry[country][pestle] || 0) + 1;
+          });
+
+          // Prepare data for the pie chart
+          const countryLabels = Object.keys(pestleCountByCountry);
+          const pieData = countryLabels.map(country => {
+            const pestleCounts = Object.values(pestleCountByCountry[country]);
+            const total = pestleCounts.reduce((acc, count) => acc + count, 0);
+            const percentages = pestleCounts.map(count => (count / total) * 100);
+            const backgroundColors = generateRandomColors(pestleCounts.length);
+
+            return {
+              label: country,
+              data: percentages,
+              backgroundColor: backgroundColors,
+            };
+          });
+
+          // Create a pie chart using D3.js
+          const svg = d3.select('#pestleChart')
+            .append('svg')
+            .attr('width', 600)
+            .attr('height', 600)
+            .append('g')
+            .attr('transform', 'translate(300,300)');
+
+          const pie = d3.pie().value(d => d);
+          const arc = d3.arc().innerRadius(0).outerRadius(150);
+
+          // Draw pie chart slices
+          svg.selectAll('path')
+            .data(pie(pieData[0].data))
+            .enter()
+            .append('path')
+            .attr('d', arc)
+            .attr('fill', (d, i) => pieData[0].backgroundColor[i])
+            .attr('stroke', 'white')
+            .style('stroke-width', '2px');
+
+          // Add country names and percentages inside the pie chart
+          svg.selectAll('text')
+            .data(pie(pieData[0].data))
+            .enter()
+            .append('text')
+            .text((d, i) => `${pieData[i].label} - ${d.data.toFixed(2)}%`)
+            .attr('transform', d => `translate(${arc.centroid(d)})`)
+            .attr('text-anchor', 'middle')
+            .style('font-size', '10px');
+
+          // Add legend beside the pie chart
+          const legend = svg.selectAll('.legend')
+            .data(pieData[0].data)
+            .enter()
+            .append('g')
+            .attr('class', 'legend')
+            .attr('transform', (d, i) => `translate(180,${i * 30 - 60})`);
+
+          legend.append('line')
+            .attr('x1', 20)
+            .attr('y1', 10)
+            .attr('x2', 50)
+            .attr('y2', 10)
+            .attr('stroke', (d, i) => pieData[0].backgroundColor[i])
+            .attr('stroke-width', '2px');
+
+          legend.append('rect')
+            .attr('x', 50)
+            .attr('width', 20)
+            .attr('height', 20)
+            .attr('fill', (d, i) => pieData[0].backgroundColor[i]);
+
+          legend.append('text')
+            .text((d, i) => `${pieData[i].label}`)
+            .attr('x', 80)
+            .attr('y', 20)
+            .style('font-size', '12px');
+        })
+        .catch(error => console.error('Error fetching data:', error));
+
+      function generateRandomColors(count) {
+        const colors = [];
+        for (let i = 0; i < count; i++) {
+          const randomColor = `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, ${Math.floor(Math.random() * 256)}, 0.6)`;
+          colors.push(randomColor);
+        }
+        return colors;
+      }
+    });
+
+    function showTechnologies() {
+      // Show Technologies Section
+      document.querySelector('.technologies-section').style.display = 'block';
+
+      // Hide Inference Section
+      document.querySelector('.inference-section').style.display = 'none';
+
+      // Scroll to Technologies Section
+      document.querySelector('.technologies-section').scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+
+    function showInference() {
+      // Show Inference Section
+      document.querySelector('.inference-section').style.display = 'block';
+
+      // Hide Technologies Section
+      document.querySelector('.technologies-section').style.display = 'none';
+
+      // Scroll to Inference Section
+      document.querySelector('.inference-section').scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+
+    function goBack() {
+      // Add your logic to navigate back to the home page
+      window.location.href = '/';
+    }
+  </script>
+
+  <!-- Include Bootstrap JS and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>End-year and Intensity Analysis</title>
+  <!-- Include Chart.js library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f8f9fa;
+      padding-top: 60px;
+      line-height: 1.6;
+      color: #343a40;
+    }
+
+    .navbar {
+      background-color: #343a40;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    .navbar-toggler-icon {
+      background-color: #fff;
+    }
+
+    .navbar-brand {
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    h1 {
+      color: #343a40;
+      font-size: 36px;
+      font-weight: bold;
+    }
+
+    canvas {
+      margin-top: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin-top: 30px;
+      transition: all 0.3s ease;
+    }
+
+    .graph-section {
+      margin-top: 50px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    /* Optional: Add a subtle box shadow on hover */
+    .graph-section:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Additional styling for the Technologies section */
+    .technologies-section,
+    .inference-section {
+      margin-top: 50px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      display: none;
+      transition: all 0.3s ease;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <button class="btn btn-link text-white" onclick="showTechnologies()">Technologies Used</button>
+        </li>
+        <li class="nav-item">
+          <button class="btn btn-link text-white" onclick="showInference()">Inference from Analysis</button>
+        </li>
+      </ul>
+      <button class="btn btn-primary" onclick="goBack()">Go Back to Home Page</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="text-center">End -year and Intensity Bar Graph</h1>
+    <canvas id="intensityChart" width="800" height="400" class="graph-section"></canvas>
+
+    <!-- Technologies Section -->
+    <div class="technologies-section">
+         <h2 class="technologies-title">Technologies Used</h2>
+         <ul class="technology-list">
+           <li class="technology-list-item">Bootstrap</li>
+           <li class="technology-list-item">Chart.js</li>
+           <li class="technology-list-item">jQuery</li>
+           <li class="technology-list-item">Popper.js</li>
+         </ul>
+       </div>
+
+    <!-- Inference Section -->
+    <div class="inference-section">
+      <h2 class="inference-title">Inference from Analysis</h2>
+      <p>The webpage features an "Intensity Bar Graph" depicting variations in intensity levels across different end years. Utilizing the Chart.js library, it provides an interactive and visually engaging representation. The bars on the graph reflect intensity values, offering a clear understanding of trends over time. The technologies employed include Bootstrap for styling and Chart.js for dynamic chart creation. The user interface allows for seamless navigation between sections, including a display of technologies used and an insightful analysis of the graph's purpose. Overall, the webpage combines effective data visualization with a user-friendly design to convey intensity trends with clarity.</p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Fetch data from the server
+      fetch('/api/data')
+        .then(response => response.json())
+        .then(data => {
+          // Extracting country names and intensities
+          const countries = data.map(entry => entry.end_year);
+          const intensities = data.map(entry => entry.intensity);
+
+          // Create a bar graph using Chart.js
+          const ctx = document.getElementById('intensityChart').getContext('2d');
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: countries,
+              datasets: [{
+                label: 'Intensity',
+                data: intensities,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)', // Blue
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: {
+                    display: true,
+                    text: 'Intensity'
+                  }
+                },
+                x: {
+                  title: {
+                    display: true,
+                    text: 'End - year'
+                  }
+                }
+              }
+            }
+          });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    });
+
+    function showTechnologies() {
+      // Show Technologies Section
+      document.querySelector('.technologies-section').style.display = 'block';
+
+      // Hide Inference Section
+      document.querySelector('.inference-section').style.display = 'none';
+
+      // Scroll to Technologies Section
+      document.querySelector('.technologies-section').scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+
+    function showInference() {
+      // Show Inference Section
+      document.querySelector('.inference-section').style.display = 'block';
+
+      // Hide Technologies Section
+      document.querySelector('.technologies-section').style.display = 'none';
+
+      // Scroll to Inference Section
+      document.querySelector('.inference-section').scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+
+    function goBack() {
+      // Add your logic to navigate back to the home page
+      window.location.href = '/';
+    }
+  </script>
+
+  <!-- Include Bootstrap JS and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
