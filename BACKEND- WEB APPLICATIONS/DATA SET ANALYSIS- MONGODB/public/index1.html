@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intensity and Country Analysis</title>
+  <!-- Include Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Include Chart.js library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f8f9fa;
+      padding-top: 60px;
+      line-height: 1.6;
+      color: #343a40;
+    }
+
+    .navbar {
+      background-color: #343a40;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+    }
+
+    .navbar-toggler-icon {
+      background-color: #fff;
+    }
+
+    .navbar-brand {
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    h1 {
+      color: #343a40;
+      font-size: 36px;
+      font-weight: bold;
+    }
+
+    canvas {
+      margin-top: 20px;
+    }
+
+    button {
+      margin-right: 10px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin-top: 30px;
+      transition: all 0.3s ease;
+    }
+
+    /* Additional styling for the Technologies section */
+    .technologies-section {
+      margin-top: 50px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      display: none;
+      transition: all 0.3s ease;
+    }
+
+    /* Additional styling for the Inference section */
+    .inference-section {
+      margin-top: 50px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      display: none;
+      transition: all 0.3s ease;
+    }
+
+    /* Stylish button styles */
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      font-weight: bold;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+
+    /* Optional: Add a subtle box shadow to sections on hover */
+    .inference-section:hover,
+    .technologies-section:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <button class="btn btn-link text-white" onclick="showTechnologies()">Technologies Used</button>
+        </li>
+        <li class="nav-item">
+          <button class="btn btn-link text-white" onclick="showInference()">Inference from Analysis</button>
+        </li>
+      </ul>
+      <!-- "Go Back to Home Page" button on the right side of the navbar -->
+      <button class="btn btn-primary" onclick="goBack()">Go Back to Home Page</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="text-center">Intensity and Country Visualization</h1>
+    <canvas id="intensityChart" width="800" height="400"></canvas>
+
+    <!-- Technologies Section -->
+    <div class="technologies-section">
+      <h2 class="technologies-title">Technologies Used</h2>
+      <ul class="technology-list">
+        <li class="technology-list-item">Bootstrap</li>
+        <li class="technology-list-item">Chart.js</li>
+        <li class="technology-list-item">jQuery</li>
+        <li class="technology-list-item">Popper.js</li>
+      </ul>
+    </div>
+
+    <!-- Inference Section -->
+    <div class="inference-section">
+      <h2 class="inference-title">Inference from Analysis</h2>
+      <p>The intensity and country visualization dashboard represents data with a bar graph showcasing the intensity values across different countries. The x-axis displays countries, while the y-axis represents intensity levels. The color-coded bars provide a clear overview of variations in intensity, aiding in easy data interpretation.
+
+        The technologies used in building this dashboard include Bootstrap for responsive design, Chart.js for dynamic and interactive charts, jQuery for simplified DOM manipulation, and Popper.js for tooltip functionality. The user can navigate between data analysis and insights sections, enhancing the overall user experience. The clean design, coupled with efficient data representation, makes it a valuable tool for users seeking to grasp and analyze intensity trends globally.</p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Fetch data from the server
+      fetch('/api/data')
+        .then(response => response.json())
+        .then(data => {
+          // Extracting country names and intensities
+          const countries = data.map(entry => entry.country);
+          const intensities = data.map(entry => entry.intensity);
+
+          // Create a bar graph using Chart.js
+          const ctx = document.getElementById('intensityChart').getContext('2d');
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: countries,
+              datasets: [{
+                label: 'Intensity',
+                data: intensities,
+                backgroundColor: 'rgba(75, 192, 192, 0.6)', // Teal
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  title: {
+                    display: true,
+                    text: 'Intensity'
+                  }
+                },
+                x: {
+                  title: {
+                    display: true,
+                    text: 'Country'
+                  }
+                }
+              }
+            }
+          });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    });
+
+    function showTechnologies() {
+      // Show Technologies Section
+      document.querySelector('.technologies-section').style.display = 'block';
+
+      // Hide Inference Section
+      document.querySelector('.inference-section').style.display = 'none';
+
+      // Scroll to Technologies Section
+      document.querySelector('.technologies-section').scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+
+    function showInference() {
+      // Show Inference Section
+      document.querySelector('.inference-section').style.display = 'block';
+
+      // Hide Technologies Section
+      document.querySelector('.technologies-section').style.display = 'none';
+
+      // Scroll to Inference Section
+      document.querySelector('.inference-section').scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+
+    function goBack() {
+      // Add your logic to navigate back to the home page
+      window.location.href = '/';
+    }
+  </script>
+
+  <!-- Include Bootstrap JS and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

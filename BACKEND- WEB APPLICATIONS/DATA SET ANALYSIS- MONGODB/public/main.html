@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Visualization Dashboard- Backendproject</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Custom Styles -->
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .brand-logo {
+      font-size: 3rem;
+      color: #007bff; /* Blue color */
+      margin-bottom: 0;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      color: #343a40;
+      margin-top: 5px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      border: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control {
+      border: 1px solid #ced4da;
+      border-radius: 0.25rem;
+      font-size: 1.2rem;
+    }
+
+    .analysis-btn {
+      background-color: #0056b3; /* Darker blue color */
+      color: #fff;
+      transition: background-color 0.3s ease;
+      font-size: 1.5rem;
+    }
+
+    .analysis-btn:hover {
+      background-color: #004080; /* Dark blue on hover */
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container mt-5">
+    <h1 class="text-center brand-logo">DATASET-ANALYSIS</h1>
+    <h2 class="text-center page-title">BACKENDPROJECT</h2>
+
+    <div class="card p-4">
+      <h1 class="card-title text-center mb-4">Visualization Dashboard</h1>
+
+      <div class="form-group">
+        <label for="analysisDropdown">Select Analysis:</label>
+        <select id="analysisDropdown" class="form-control">
+          <option value="" disabled selected>Select an Analysis</option>
+          <option value="/1">Intensity and Country Analysis</option>
+          <option value="/2">Topics and Likelihood Analysis</option>
+          <option value="/3">Pestle Distribution in each country</option>
+          <option value="/4">End-year and Intensity Analysis</option>
+          <option value="/5">Intensity and Country analysis</option>
+          <option value="/6">Regions and Cumulative Likelihood Analysis</option>
+          <option value="/8">Cumulative Intensity and Topic Analysis</option>
+          <option value="/9">Region-Sector Analysis</option>
+          <option value="/10">End Year and Likelihood Analysis</option>
+        </select>
+      </div>
+
+      <button class="btn btn-block analysis-btn" onclick="navigateToAnalysis()">Go to Analysis</button>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <script>
+    function navigateToAnalysis() {
+      var selectedAnalysis = document.getElementById("analysisDropdown").value;
+      if (selectedAnalysis) {
+        window.location.href = selectedAnalysis;
+      }
+    }
+  </script>
+</body>
+
+</html>

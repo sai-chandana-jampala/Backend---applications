@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regions and Cumulative Likelihood Analysis</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f8f9fa;
+      padding-top: 60px;
+      line-height: 1.6;
+      color: #343a40;
+    }
+
+    h1 {
+      color: #343a40;
+      font-size: 36px;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    #barChart {
+      width: 100%;
+      height: 500px;
+      margin-top: 20px;
+    }
+
+    nav.navbar {
+      background-color: #343a40;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    nav.navbar-toggler-icon {
+      background-color: #fff;
+    }
+
+    a.navbar-brand {
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    ul.navbar-nav.ml-auto li.nav-item a.nav-link {
+      color: #fff;
+    }
+
+    ul.navbar-nav.ml-auto li.nav-item.active a.nav-link {
+      color: #007bff;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin-top: 30px;
+    }
+
+    .technologies-section,
+    .inference-section {
+      margin-top: 50px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      display: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      font-weight: bold;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+
+    .inference-section:hover,
+    .technologies-section:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <button class="btn btn-link text-white" onclick="showTechnologies()">Technologies Used</button>
+        </li>
+        <li class="nav-item">
+          <button class="btn btn-link text-white" onclick="showInference()">Inference from Analysis</button>
+        </li>
+      </ul>
+      <button class="btn btn-primary" onclick="goBack()">Go Back to Home Page</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Regions and Cumulative Likelihood Bar Chart</h1>
+    <div id="barChart"></div>
+
+    <!-- Technologies Section -->
+    <div class="technologies-section" id="technologiesSection">
+      <h2 class="technologies-title">Technologies Used</h2>
+      <ul class="technology-list">
+        <li class="technology-list-item">Bootstrap</li>
+        <li class="technology-list-item">Chart.js</li>
+        <li class="technology-list-item">jQuery</li>
+        <li class="technology-list-item">Popper.js</li>
+        <li class="technology-list-item">Google charts</li>
+      </ul>
+    </div>
+
+    <!-- Inference Section -->
+    <div class="inference-section" id="inferenceSection">
+      <h2 class="inference-title">Inference from Analysis</h2>
+      <p>
+        
+        The "Regions and Cumulative Likelihood Bar Chart" utilizes a tech stack comprising Bootstrap for a responsive layout, Chart.js for dynamic chart creation, jQuery for simplified DOM manipulation, Popper.js for tooltip functionality, and Google Charts for generating the bar chart. The chart visually represents the cumulative likelihood across different regions. From the graph, it's evident that certain regions have higher cumulative likelihoods, providing insights into the distribution of likelihood values. The combination of technologies facilitates effective data visualization and user-friendly presentation of regional data insights.</p>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Fetch data from the server
+      fetch('/api/data')
+        .then(response => response.json())
+        .then(data => {
+          // Create a map to store region data
+          const regionData = new Map();
+
+          // Calculate cumulative likelihood for each region
+          data.forEach(entry => {
+            const region = entry.region;
+            const likelihood = parseFloat(entry.likelihood); // Parse likelihood as a float
+
+            if (!regionData.has(region)) {
+              regionData.set(region, { cumulativeLikelihood: 0 });
+            }
+
+            regionData.get(region).cumulativeLikelihood += likelihood;
+          });
+
+          // Prepare data for Google Charts
+          const chartData = [['Region', 'Cumulative Likelihood']];
+          regionData.forEach((value, key) => {
+            chartData.push([key, value.cumulativeLikelihood]);
+          });
+
+          // Load Google Charts and draw the bar chart
+          google.charts.load('current', { packages: ['corechart'] });
+          google.charts.setOnLoadCallback(drawBarChart);
+
+          function drawBarChart() {
+            const data = google.visualization.arrayToDataTable(chartData);
+
+            const options = {
+              title: 'Regions and Cumulative Likelihood Bar Chart',
+              legend: { position: 'none' },
+              hAxis: { title: 'Cumulative Likelihood' },
+              vAxis: { title: 'Region' }
+            };
+
+            const chart = new google.visualization.BarChart(document.getElementById('barChart'));
+            chart.draw(data, options);
+          }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    });
+
+    function showTechnologies() {
+      // Show Technologies Section
+      document.querySelector('.technologies-section').style.display = 'block';
+      document.querySelector('.inference-section').style.display = 'none';
+
+      // Scroll to Technologies Section
+      document.querySelector('#technologiesSection').scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+
+    function showInference() {
+      // Show Inference Section
+      document.querySelector('.inference-section').style.display = 'block';
+      document.querySelector('.technologies-section').style.display = 'none';
+
+      // Scroll to Inference Section
+      document.querySelector('#inferenceSection').scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
+
+    function goBack() {
+      // Add your logic to navigate back to the home page
+      window.location.href = '/';
+    }
+  </script>
+
+  <!-- Include Bootstrap JS and jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
